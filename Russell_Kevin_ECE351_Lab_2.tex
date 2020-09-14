@@ -1,0 +1,331 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 2 %
+% September 8, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\newcommand{\experimentDate}{September 8, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 2}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{User-Defined Functions}
+\newcommand{\experimentShortName}{User-Defined Functions}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+    
+    \newpage
+        \tableofcontents
+    
+    \newpage
+        \section{Introduction}
+            The purpose of this lab was to become familiar with defining and implementing user-defined functions within Python.  This lab will also demonstrate the use of common signal operations, such as time shifting, time scaling, time reversal, signal addition, and differentiation.  For this lab, the programming environment Spyder will be used.  This report will be broken into parts, following the outline of the lab.
+            
+        \section{Part 1}
+            \subsection{Introduction}
+            The goal of Part 1 was to become familiar with defining a user defined function and producing an output from it.  An example given with the lab handout was used as a guide for this part.  This part used the "def" function in Python.
+            
+            \subsection{Equations}
+            \begin{equation}
+                y=\cos{t}
+            \end{equation}
+            
+            \subsection{Methodology}
+            To solve this part of the lab, I followed the example given with the lab handout that showed how to define a function within Python.  Additionally, since the goal was to have a high resolution curve, I made sure to have a small enough step size to have a smooth curve.  This turned out to be $1\times10^{-2}$.  After defining the function, I then followed the example again to graph the function properly, with labels and within the specified time period.
+            
+            \subsection{Results}
+            The following code was used to define the function required for this part of the lab.
+            
+            
+            \lstset{language=Python}
+            \lstset{frame=lines}
+            \lstset{caption={Insert code directly in your document}}
+            \lstset{label={lst:code_direct}}
+            \lstset{basicstyle=\footnotesize}
+            \begin{lstlisting}[language=Python, caption=Part 1 Code]
+            import numpy as np
+            import matplotlib.pyplot as plt
+
+            plt.rcParams.update({'font.size':14})
+
+            steps =1e-2
+            t=np.arange(0,10+steps,steps)
+
+            def func1(t):
+                    y=np.zeros(t.shape)
+    
+                        for i in range (len(t)):
+                             y[i]=np.cos(t[i])
+                        return y
+
+            y=func1(t)
+
+            plt.figure(figsize = (10,7))
+            plt.subplot(2,1,1)
+            plt.plot(t,y)
+            plt.grid()
+            plt.ylabel('y(t) with good resolution')
+            plt.xlabel('Time')
+            plt.title('Part 1: Task 2 - Cosine Plot')
+            plt.show()
+            
+            \end{lstlisting}
+            
+            After the code was run, the following graph was produced.
+            
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale =0.7]{Part1 Task2.png}
+                \caption{Cosine Plot}
+                \label{fig:my_label}
+            \end{figure}
+            
+            The graph that was produced was a true cosine plot that was smooth, as expected.  This confirms that the code in Listing 1 is effective in writing a user-defined function. 
+            
+            \subsection{Error Analysis}
+            Since this lab dealt with plotting a known function ususing a simulation, there was no error that was produced.  The only difficulty I had with this part of the lab was being new to using user-defined functions.  It took me extra time to understand how the userdefined function was working.
+            
+            \subsection{Questions}
+            There were no questions for this part of the lab.
+            
+            \subsection{Conclusion}
+            This part of the lab gave a great introduction into using user-defined functions in Python.  I was able to become familiar with how to write them, in addition to how to plot them on a graph.  This will be helpful in future labs as this class deals with many mathematical expressions and plotting them to confirm their accuracy.
+            
+        \newpage
+        \section{Part 2}
+            \subsection{Introduction}
+            The goal of Part 2 was to use user-defined functions to model a plot that was provided.  The plot was a graph that could be interpreted using step and ramp functions.
+            
+            \subsection{Equations}
+            
+            \begin{equation}
+                y(t)=r(t)-r(t-3)+5u(t-3)-2u(t-6)-2r(t-6)
+            \end{equation}
+            
+            Equation 2 was derived from interpreting the following figure:
+            
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale=0.7]{Screenshot 2020-09-12 142637.jpg}
+                \caption{Function for Part 2}
+                \label{fig:my_label}
+            \end{figure}
+            
+            \subsection{Methodology}
+            To solve this part of the lab, I started by interpreting the figure that was provided and deriving the equation necessary to graph it.  Since I needed step and ramp functions, I created two user-defined functions, one for a step function and one for a ramp function.  Both were defined using the mathematical definition. I plotted both of these functions to confirm their accuracy. Next, I created a third user defined function to implement equation 2.  This function used a combination of time shift and scaled versions of the step and ramp functions.  The equation was then plotted from -5 to 10s to confirm it matches the figure.
+            
+            \subsection{Results}
+            The following is the code used to define the step function, ramp function, and function to define figure 2.
+            
+            \lstset{language=Python}
+            \lstset{frame=lines}
+            \lstset{caption={Insert code directly in your document}}
+            \lstset{label={lst:code_direct}}
+            \lstset{basicstyle=\footnotesize}
+            \begin{lstlisting}[language=Python, caption=Part 2 Code]
+    def step(t): #defining step function using mathematical definition
+    y=np.zeros(t.shape)
+    
+    for i in range (len(t)):
+        if t[i]<0:
+            y[i]=0
+        else:
+            y[i]=1
+            
+    return y    
+
+    def ramp(t): #defining ramp function using mathematical definition
+    y=np.zeros(t.shape)
+    
+    for i in range (len(t)):
+        if t[i]<0:
+            y[i]=0
+        else:
+            y[i]=t[i]
+    return y  
+
+    def rampstep(t): #defining function for figure 2
+        
+        return (ramp(t)-ramp(t-3)+5*step(t-3)-2*step(t-6)-2*ramp(t-6))
+    
+    y= rampstep(t)
+    
+            \end{lstlisting}
+            
+            The following figures are the plots of the step function, ramp function, and function to define figure 2, respectively. 
+            \newpage
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{Part 2 step.png}
+                \caption{Step Function}
+                \label{fig:my_label}
+            \end{figure}
+
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{part 2 ramp.png}
+                \caption{Ramp Function}
+                \label{fig:my_label}
+            \end{figure}
+            \newpage
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{part 2 stepramp.png}
+                \caption{Figure 2 Function}
+                \label{fig:my_label}
+            \end{figure}
+            
+            These figures are as expected.  Figures 3 and 4 show a step and ramp function as is expected.  Figure 5 matches figure 2 exactly.
+            
+            
+            \newpage
+            \subsection{Error Analysis}
+             Since this lab dealt with plotting a known function using a simulation, there was no error that was produced.  The only difficulty I had with this part of the lab was understanding how to define the given figure in terms of step and ramp functions.  Since we had just started learning about it in ECE 350, I had little experience and was unsure how to define the function.
+             
+             \subsection{Questions}
+             There were no questions for this part of the lab.
+             
+             \subsection{Conclusion}
+             This part of the lab gave a great demonstration of the usefulness of user defined functions.  I was able to use them to define simpler functions that can be used simplify a more complex function.  This will be helpful when implementing more complex functions in future labs.
+             \clearpage
+        \section{Part 3}
+            \subsection{Introduction}
+            The goal of Part 3 was to use the function defined in part 2 (equation 2) with time-shifting and scaling.  A derivative will also be applied to this function.
+            
+            \subsection{Equations}
+            \begin{equation}
+                y(t)=r(t)-r(t-3)+5u(t-3)-2u(t-6)-2r(t-6)
+            \end{equation}
+            \begin{equation}
+                y(-t), y(t-4), y(-t-4), y(t/2), y(2t), \frac{dy(t)}{dx}
+            \end{equation}
+            
+            Equation 3 is the same as Equation 2 from part 2.  This is the equation that will be operated on.  Equation 4 lists all of the operations that will be implemented on equation 3.
+            
+            \subsection{Methodology}
+            To solve this part of the lab, I defined each function from equation 4 using the previously implemented user defined function for equation 3.  Each were plotted to check for accuracy.  For the differential, I first plotted the differential by hand.  Then, using the numpy.diff() function, I performed the derivative on equation 3 and plotted it.  This was then compared to the hand plot.
+            
+            \subsection{Results}
+            The following are the plots of each of the functions from equation 4:
+            
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{part 3 time reversal.png}
+                \caption{Time Reversal}
+                \label{fig:my_label}
+            \end{figure}
+            
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{part 3 time shift.png}
+                \caption{Time Shift}
+                \label{fig:my_label}
+            \end{figure}
+            
+            \newpage
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{part 3 time scale.png}
+                \caption{Time Scale}
+                \label{fig:my_label}
+            \end{figure}
+            
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.65]{test (1).jpg}
+                \caption{Hand Plot of Derivative}
+                \label{fig:my_label}
+            \end{figure}
+            \clearpage
+            \begin{figure}[h!]
+                \centering
+                \includegraphics[scale = 0.7]{part 3 derrivative.png}
+                \caption{Derivative}
+                \label{fig:my_label}
+            \end{figure}
+           
+            
+            These figures are what was expected based off of knowing the time-shift, time-scale, and  derivative functions.  This shows that python is able to properly implement these operations on a user-defined function.
+            
+            
+            
+            \newpage
+            \subsection{Error Analysis}
+            Since this lab dealt with plotting a known function using a simulation, there was no error that was produced.  The only difficulty I had with this part of the lab was implementing the derivative function.  This required some extra research as well as help from the TA in order to complete.
+            
+            \subsection{Questions}
+            
+            \begin{enumerate}
+                \item The hand plot of the derivative and the python plot of the derivative are not identical.  The python plot has pieces that go to infinity (shown as vertical lines) while the hand plot does not.  This occurred because python is performing the derivative on the vertical portions of the step function, which it sees as being infinite slope.  When doing it by hand, I am able to ignore this piece and know that it is connecting two lines.  From my minimal experience with python, I do not think there is a way to correct this.  This might be able to be corrected by performing multiple derivatives over the entire function to eliminate the parts that have a vertical line.
+                \item As the step size becomes larger, the python plot of the derivative starts to have angled portions.  This occurs because the user-defined functions implement loops and if-statements that rely on the step size.  It also performs approximations at these steps.  With the larger step size, the approximations will be farther apart, making the graph appear to have a sloped portion.  With the smaller step size, Python can have more accurate approximations with more iterations of the loops and if-statements in the user-defined functions.  This will cause the plot to be more accurate and appear to have vertical lines, as is expected and similar to the hand plot.
+                \item  All instructions in the lab were clear and well defined.  There was little to no confusion or questions at any point in the lab.
+            \end{enumerate}
+            
+            \subsection{Conclusion}
+            This part of the lab was beneficial in practicing operations on user-defined functions, such as shifting, scaling, and differentiation.  These will simplify future labs in that a user defined function can be used repeatedly with small modifiers to fit the application needs.
+            
+         \section{Overall Conclusion}
+        This lab was important to understanding the basics of creating and using user-defined functions in Python.  As stated in the part-specific conclusions, this will be beneficial in simplifying future labs by implementing user-defined functions and being able to refer back to them later in the code.  This lab was successful in learning these concepts and I look forward to applying them in future labs.
+           
+            
+    
+        \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
