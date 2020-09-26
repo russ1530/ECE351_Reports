@@ -1,0 +1,176 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 4 %
+% September 22, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+
+\newcommand{\experimentDate}{September 22, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 4}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{System Step Response Using Convolution}
+\newcommand{\experimentShortName}{Step Response}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+    
+    \newpage
+        \tableofcontents
+    
+    \newpage
+        \section{Introduction}
+        The purpose of this lab was to become familiar with implementing the convolution function to find a system's step response.  This will be using the convolution function that was generated as part of the previous lab.  The function was determined to be accurate in comparison to python's built in function for convolution, and therefore will be used in this lab.
+        
+        \section{Equations}
+        The following signals were defined as user defined functions and then the step response was found for each.
+        
+        \begin{equation}
+            h_{1}(t) = e^{2t}u(1-t)
+        \end{equation}
+        \begin{equation}
+             h_{2}(t)=u(t-2)-u(t-6)
+        \end{equation}
+        \begin{equation}
+            h_{3}(t)=\cos{(w_0t)}u(t)
+        \end{equation}
+        
+        These equations were then convolved with the unit step function.  The following are the convolution statement followed by the result of the hand convolution.
+        
+        
+        H1(t) Step Response:
+        \begin{equation}
+            \begin{split}
+                h_{1}(t) * u(t) = e^{2t}u(1-t) * u(t)\\
+                = \frac{1}{2}e^{2t}u(1-t) + e^2u(t-1)
+            \end{split}
+            \nonumber
+        \end{equation}
+        
+        H2(t) Step Response:
+        \begin{equation}
+            \begin{split}
+                h_2(t)*u(t) = [u(t-2) - u(t-6)] * u(t)\\
+                =(t-2)u(t-2) - (t-6)u(t-6)
+            \end{split}
+            \nonumber
+        \end{equation}
+        
+        H3(t) Step Response:
+        \begin{equation}
+            \begin{split}
+                h_3(t)*u(t) = \cos{(w_0t)}u(t)*u(t)\\
+                =0.6366\sin{(1.5708t)}u(t)
+            \end{split}
+            \nonumber
+        \end{equation}
+        
+        \section{Methodology}
+        To solve this lab, I began by defining equations 1 through 3 as user defined functions
+        in Python. This was done so they can easily be referred back to later in the lab. To do this,
+        I followed the same process as lab 2, using my work as an example. These functions were
+        then plotted to confirm that the code was written properly.
+        
+        After defining the functions, I then used the convolution function defined in Lab 3 to convolve each function with the unit step function.  This was done in order to find the step response of each function.  Each convolution was graphed to check for accuracy.  Additionally, each convolution was performed by hand to confirm that python correctly performed the convolution and to compare the hand and computer generated convolutions.  The hand convolutions were also plotted.
+        
+        \clearpage
+        \section{Results}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.3]{function.png}
+            \caption{Plots of Equations 1 through 3}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 1 represents the plots that were defined at the beginning of the lab. These functions were plotted as expected based on previous knowledge of signals.
+        \clearpage
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.5]{python.png}
+            \caption{Python performed convolutions}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 2 represents the output of the convolutions performed with each of equations 1 through 3 and the unit step function.  This output is the step response for each function.  These convolutions seem to be accurate based on previous knowledge of how convolution works.  This will further be confirmed by the hand performed convolutions.
+        \clearpage
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.5]{hand.png}
+            \caption{Hand performed convolutions}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 3 represents the output of hand convolutions as graphed by python.  The beginning side of the convolution matches the convolution plot performed by python.  This plot, however, does not end since python is unable to fully interpret the functions that were inputted. 
+        
+        
+        \section{Error Analysis}
+        There was no error produced in this lab since and ideal simulation was used.  However, there was some difficulty with determining the best way to perform the hand convolution.  The TA was able to help with this and remove any confusion.
+        
+        \section{Questions}
+        \begin{enumerate}
+            \item Leave any feedback on the clarity of the lab, tasks, expectations, and deliverables.
+            
+            This lab was very clear on the expectations required and the procedures that needed to be followed.  There are no recommendations for improvements.
+        \end{enumerate}
+        
+        \section{Conclusion}
+        This lab was very helpful in solidifying the concepts of creating user defined functions as well as using them within a convolution function.  Convolution concepts from class were also used, solidified, and shown to be very useful in completing this lab.  The lab presented these ideas in a way that it was mostly successful in solidifying these concepts. I look forward to using concepts from this lab in future labs.
+        
+        \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}

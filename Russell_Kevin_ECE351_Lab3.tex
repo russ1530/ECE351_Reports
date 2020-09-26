@@ -1,0 +1,235 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 3 %
+% September 15, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\newcommand{\experimentDate}{September 15, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 3}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Discrete Convolution}
+\newcommand{\experimentShortName}{Discrete Convolution}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+    
+    \newpage
+        \tableofcontents
+    
+    \newpage
+        \section{Introduction}
+        The purpose of this lab was to become familiar with convolution within the Python environment.  Functions were defined, using step and ramp functions from lab 2, to be used throughout this lab as an example.  This lab then was a guide to writing a generic convolution function and comparing it to Python's built-in convolution tool.
+        
+        \section{Equations}
+        The following are the equations that were defined and later convolved in this lab.
+        \begin{equation}
+            f1(t) = u(t-2) -u(t-9)
+        \end{equation}
+        \begin{equation}
+            f2(t) = e^{-t}u(t)
+        \end{equation}
+        \begin{equation}
+            f3(t) = r(t-2)[u(t-2) -u(t-3)]+r(4-t)[u(t-3)-u(t-4)]
+        \end{equation}
+        
+        \section{Methodology}
+        To solve this lab, I began by first defining equations 1 through 3 as user defined functions in Python.  This was done so they can easily be referred back to later in the lab.  To do this, I followed the same process as lab 2, using my work as an example.  These functions were then plotted to confirm that the code was written properly.  Below is code defining these functions:
+        
+            \begin{lstlisting}[language=Python, caption=Part 1 Code]
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.signal as sig
+            
+def step(t): #defining step function using mathematical definition
+    y=np.zeros(t.shape)
+                
+    for i in range (len(t)):
+    if t[i]<0:
+        y[i]=0
+     else:
+        y[i]=1
+                        
+    return y    
+            
+def ramp(t): #defining ramp function using mathematical definition
+     y=np.zeros(t.shape)
+                
+for i in range (len(t)):
+    if t[i]<0:
+        y[i]=0
+     else:
+        y[i]=t[i]
+    return y  
+            
+def f1(t):
+                
+    return step(t-2)-step(t-9)
+            
+ def f2(t):
+                
+    return np.exp(t)
+            
+ def f3(t):
+                
+    return ramp(t-2)*(step(t-2)-step(t-3))+ramp(4-t)*(step(t-3)-step(t-4))
+            \end{lstlisting}
+            
+        After defining the functions, code was then written to convolve two functions.  This was much more difficult to do since it required using knowledge of how convolution worked, fundamentally.  I thought of it in a graphical sense where the two functions would overlap and the areas would be multiplied.  This required several for-loops and if-statements.  In the end, the TA guided us through writing the code for this function since we were unable to achieve it on our own after much trial and error.  Below is the code the for the convolution function.
+        \begin{lstlisting}[language=Python, caption=Part 1 Code]
+def conv(f_1,f_2): #Defining convolution
+    Nf1=len(f_1) #defining length of the first function
+    Nf2=len(f_2) #defining length of the second function
+    
+    f1new = np.append(f_1,np.zeros((1, (Nf2-1)))) #making both functions 
+                                                    #equal in length
+    f2new = np.append(f_2,np.zeros((1, (Nf1-1))))
+    result=np.zeros(f1new.shape) #creating array for output
+    
+    for i in range(Nf2+Nf1 -2): #for loop to go through all values of t 
+                                    #(length of functions added together)
+        result[i] =0
+        for j in range (Nf1): #for loop to go through all values of 
+                                #the first function
+            if(i - j + 1 > 0): #this multiplies the two functions 
+                                #together as the first passes by 
+                                #the second in a graphical sense
+                result[i] += f1new[j]*f2new[i - j + 1]
+            
+    return result
+
+steps = 1e-2
+t=np.arange(0,20+steps, steps)
+NN=len(t)
+tnew = np.arange(0,2*t[NN-1],steps) #makes the length match the 
+                                    #newly convolved functions
+
+        \end{lstlisting}
+        
+        Convolutions were now performed using the user-defined function and comparing them to python's built-in convolution function.  The convolutions performed were Equations 1 and 2, Equations 2 and 3, and Equations 1 and 3.  The convolutions were plotted and checked for accuracy from what would be expected.
+        \clearpage
+        \section{Results}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.3]{part1.png}
+            \caption{Equations 1 through 3}
+            \label{fig:my_label}
+        \end{figure}
+        Figure 1 represents the plots that were defined at the beginning of the lab.  These functions were plotted as expected based on previous knowledge of graphing step, ramp, and exponential functions.
+        \clearpage
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.5]{part2_1.png}
+            \caption{Convolution of Equations 1 and 2}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 2 represents the convolution performed between equations 1 and 2.  The dashed orange line is python's built-in convolution function while the blue solid line represents the user-defined function created through this lab.  It can be seen that these functions are almost identical and could be used interchangeably.  Furthermore, this convolution seems to be accurate based on the prior knowledge of how convolution works.
+        \clearpage
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.5]{part2_2.png}
+            \caption{Convolution of Equations 2 and 3}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 3 represents the convolution performed between equations 2 and 3.  The dashed orange line is python's built-in convolution function while the blue solid line represents the user-defined function created through this lab.  It can be seen that these functions are almost identical and could be used interchangeably.  Furthermore, this convolution seems to be accurate based on the prior knowledge of how convolution works.
+        \clearpage
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=0.5]{part2_3.png}
+            \caption{Convolution of Equations 1 and 3}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 4 represents the convolution performed between equations 1 and 3.  The dashed orange line is python's built-in convolution function while the blue solid line represents the user-defined function created through this lab.  It can be seen that these functions are almost identical and could be used interchangeably.  Furthermore, this convolution seems to be accurate based on the prior knowledge of how convolution works.
+        
+        All of these plots were plotted as expected and shows that the code written during this lab is accurate and properly functioning.
+        
+        \clearpage
+        \section{Error Analysis}
+        There was no error produced in this lab since an ideal simulation was used.  However, there was some difficulty in determining the best approach to making the convolution user-defined function.  I was unsure of the best approach for multiplying the areas of the functions iteratively through each.  The TA was helpful in walking the class through the thinking process and explaining and giving ideas for code to achieve a successful convolution.
+        
+    \newpage    
+        \section{Questions}
+        \begin{enumerate}
+            \item Did you work alone or with others on this lab?  If you collaborated to get to the solution, what did that process look like?
+            
+            I did work with other people on this lab.  Most of the time was spent working alone, but we came together as a class and discussed the lab and thinking process.  The TA lead this by giving us helpful hints to start the thinking process and then having us come back with ideas, eventually leading to a solution to the lab.
+            
+            \item What was the most difficult part of this lab for you, and what did your problem-solving process look like?
+            
+            The most difficult part of this lab was figuring out how to complete the convolution with loops.  My process was trial-and-error based.  In other words, I tried one set of loops and saw if that outputted the correct convolution.  If not, I modified it and tried it again.  This process was aided by my knowledge of how convolution worked, in addition to helpful hints from the TA and other classmates.
+            
+            \item Did you approach writing the code with analytical or graphical convolution in mind?  Why did you chose this approach?
+            
+            I approached this lab with the mindset of graphical convolution.  This was a very natural decision because I tend to be a visually minded person.  Additionally, I find thinking about convolution easier in a graphical sense than analytically because I can see what the analytics are doing to the functions.
+            
+            \item  Leave any feedback on the clarity of lab tasks, expectations, and deliverables.
+            
+            This lab was written well and the expectations were clear.  The difficulty of this lab was more than was expected and it was difficult for anyone in the class to complete the lab without help or receiving the answer from the TA.  Could there be a way to break the lab in pieces to guide students through the thinking of convolving functions in python?
+        \end{enumerate}
+        
+        \section{Conclusion}
+       This lab was important to solidifying the concept of creating user defined functions.  Additionally, it was helpful in defining a convolution function that can be used with any two functions.  This will be important to future labs that will require the use of convolution in python. The lab presented these ideas in a way that it was mostly successful in solidifying or teaching these concepts.  I look forward to using concepts from this lab in future labs. 
+        
+        \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
