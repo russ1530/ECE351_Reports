@@ -1,0 +1,161 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 5 %
+% September 29, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+
+\newcommand{\experimentDate}{September 29, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 5}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Step and Impulse Response of an RLC Bandpass Filter}
+\newcommand{\experimentShortName}{Step and Impulse Response}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+    
+    \newpage
+        \tableofcontents
+        
+   \newpage
+        \section{Introduction}
+        The purpose of this lab was to become familiar with using the Laplace Transform within python.  For this lab the time-domain response of an RLC Bandpass filter circuit was found with impulse and step inputs. Additionally, the hand calculated impulse response will be compared to python's scipy.signal.impulse() function to verify accuracy.
+        
+        \section{Equations}
+        From the pre-lab, the following is the transfer function that was derived from the circuit.
+        
+        \begin{equation}
+            H(s)=\frac{V_{out}}{V_{in}}=\frac{\frac{s}{RC}}{s^2+\frac{s}{RC}+\frac{1}{LC}}
+        \end{equation}
+        
+        This was then used to find the hand calculated impulse response which resulted in the following pieces using the sine method:
+        
+                \begin{equation}
+                S=-\frac{1}{2RC}\pm \frac{1}{2}\sqrt{(\frac{1}{RC})^2-4(\frac{1}{\sqrt{LC}})^2}
+                \end{equation}
+                
+                \begin{equation}
+                    p=\alpha+j\omega=-\frac{1}{2RC}\pm \frac{1}{2}\sqrt{(\frac{1}{RC})^2-4(\frac{1}{\sqrt{LC}})^2}
+                \end{equation}
+                
+                \begin{equation}
+                    |g|=\sqrt{(-\frac{1}{2}(\frac{1}{RC})^2)2+(\frac{1}{2RC}\sqrt{(\frac{1}{RC})^2-4(\frac{1}{\sqrt{LC}})^2})^2}
+                \end{equation}
+                
+                \begin{equation}
+                    \angle g = \frac{\frac{1}{2RC}\sqrt{(\frac{1}{RC})^2-4(\frac{1}{\sqrt{LC}})^2})^2}{-\frac{1}{2}(\frac{1}{RC})^2}
+                \end{equation}
+        
+        \section{Methodology}
+        To solve this lab, I started by defining the sine method to transform back to the time domain from the Laplace domain.  In python, this was done using a user defined function and coding in the equations for the steps of the sine method.  These equations are outlined in equations 2 through 5.  For the magnitude and angle of g, numpy's built in absolute value and angle functions were used.  This output was multiplied by the step function and then graphed.  The step function code was copied from the previous labs.  After, the scipy impulse function was used on the transfer function found in pre-lab to compare to the hand calculated impulse function.  To use the scipy impulse function, the numerator and denominator coefficients were added to a matrix and then added to the function itself.  This was plotted on a subplot with the hand calculated version for a direct comparison.
+        
+        For the next part of the lab, the scipy step function was used to find the step response of the transfer function.  This followed the same procedure as using the scipy impulse response.  The function was graphed and compared to that of the impulse response. Then, the final value theorem was found by performing a hand calculation.
+        
+        \section{Results}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=.5]{impulse response.png}
+            \caption{Impulse response of an RLC Bandpass Filter}
+            \label{fig:my_label}
+        \end{figure}
+        \clearpage
+        Figure 1 shows the plot generated from both the hand calculated impulse response as well as the scipy impulse response.  These plots show that the scipy plot is exactly the same as the hand calculated plot.  This was expected based on previous labs showing the accuracy of built-in python fuctions.  Additionally, the plots look as expected based on previous knowledge of how a bandpass filter works.
+        
+        \clearpage
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale=.5]{step response.png}
+            \caption{Step response of an RLC Bandpass Filter}
+            \label{fig:my_label}
+        \end{figure}
+        
+        Figure 2 shows the plot generated from the scipy step response.  This was expected because a convolution with the step function will start at zero and gradually build up.
+        
+        In comparison to figure 1, this figure 2 begins at zero while figure 1 begins at the peak. There is also a difference on the y-axis scale with figure 1 being much greater.  This is all expected because for the step response, H(s) is convolved with u(s).  This causes the function to start at zero and gradually build up as the function moves across the step, thinking of it in a graphical sense. Then it will follow the same pattern as the impulse response.
+        
+        
+        The Final Value of the step response was then found using the Final Value Theorem.  The results are as follows:
+        
+        \begin{equation}
+            \lim_{x\to \infty}\{f(t)\} =  \lim_{s\to 0}\{sH(s)\}=\lim_{s\to 0}\{s\frac{\frac{s}{RC}}{s^2+\frac{s}{RC}+\frac{1}{LC}}\}=0
+        \end{equation}
+        
+        Discussion on this result will be included in the section 6 of this report.
+        
+        \section{Error Analysis}
+        There was no error produced in this lab since and ideal simulation was used.  The only difficulty during was making sure to remember the correct syntax for python and programming functions when implementing the sine method.
+        \section{Questions}
+        \begin{enumerate}
+            \item Explain the result of the Final Value Theorem in terms  of the physical circuit components.
+            \newline
+            \newline
+            The Final Value Theorem shows that at an infinite time after the circuit starts, the output value will be zero.  Since this is a DC circuit, the capacitor will charge until in is unable to anymore.  This will send all the current through the inductor, since there is no load.  When that happens, the inductor will act like a wire, based on properties of DC circuits.  Since there is minimal to no voltage drop across a wire, the output voltage will be 0.
+            \newline
+            
+            \item Leave any feedback on the clarity of the expectations, instructions, and deliverables.
+            \newline
+            \newline
+            This lab was very clear and straightforward on every aspect.  With the pre-lab however, it would have been helpful to know to solve the circuit using variables for both parts, rather than using numbers.  Additionally, having known that the functions would be programmed in python, the entire sine method would not have needed to be completed for pre-lab.
+        \end{enumerate}
+       \clearpage
+        \section{Conclusion}
+       This lab was helpful in understanding the difference between an impulse and step response using visuals.  Additionally, it was beneficial to see that the built in scipy function for the impulse response will produce the same plot as a hand calculation.  This will save time in future labs and projects by removing hand calculations.  This lab also provided an opportunity to think about why an RLC Bandpass filter behaves the way it does.  Ideas in this lab were presented in a way that was successful in solidifying these concepts.  
+        \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
