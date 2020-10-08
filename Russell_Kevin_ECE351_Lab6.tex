@@ -1,0 +1,159 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 6 %
+% October 6, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\newcommand{\experimentDate}{October 6, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 6}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Partial Fraction Expansion}
+\newcommand{\experimentShortName}{Partial Fraction Expansion}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+    
+    \newpage
+        \tableofcontents
+        
+   \newpage
+        \section{Introduction}
+       The purpose of this lab was to become familiar with the Scipy Residue function built into Python.  This function performs partial fraction expansion.  Through this lab, the Scipy Residue function will be compared to the hand result of a partial fraction expansion.  Additionally, the accuracy of the step response using Python's built in Scipy Step function will be shown in comparison to hand calculations.
+        
+        \section{Equations}
+        Hand calculated transfer function from the prelab:
+             \begin{equation}
+                H(s)= \frac{Y(s)}{X(s)}=\frac{s^2+6s+12}{s^2+10s+24}
+            \end{equation}
+        Hand calculated step response from the prelab:
+        
+            \begin{equation}
+                 y(t) = (\frac{1}{2}+e^{-6t}-\frac{1}{2}e^{-4t})u(t)
+            \end{equation}
+            
+        Transfer function for the system described in lab:
+            \begin{equation}
+                H(s) = \frac{25250}{s^5+18s^4+219s^3+2036s^2+9085s+25250}
+            \end{equation}
+        
+        \section{Methodology}
+        To solve this lab, the step function from previous labs was imported to be used later in lab.  Then, a definition of the step response from the prelab assignment was coded into Python.  Using the transfer function (equation 1) from the prelab the step response was then found in python using the Scipy Step function.  This function takes in the coefficients of both the numerator and denominator of the transfer function.  After, both of these step responses were plotted on the same graph and shown to be identical.  The Scipy Residue function was then used to find the partial fraction expansion of the transfer function.  As with the Scipy Step function, the Scipy Residue function takes in the numerator and denominator of the transfer function.  The output is the residue and poles.  These results were compared to the partial fraction expansion found in the prelab.
+       
+       For the second part, the system described lab was written as a transfer, which resulted in equation 3.  Then, this was inputted into the Scipy Residue function to find the partial fraction expansion.  Since the result turned out to be complex, the cosine method was programmed into python using a user defined function.  This function takes in the residue, pole, and time variable, operates on them as would be done by hand, and then outputs the step response.  Since there was more than one residue and pole, a for loop was written to step through each pair of residue and pole, use them in the cosine method, and then add the result to the total final result.  The step response of the transfer function was also found using the built in Scipy Step function.  Both of the step response were plotted and compared, showing identical results.
+        
+        \section{Results}
+       Figure 1 is the output plot comparing the hand calculated step response (equation 2) and the Scipy Step function step response using the hand calculated transfer function.  It can be seen that both of these plots are identical showing the comparability of hand calculations and the built in step response function.
+       
+       The following is the Scipy Residue output of the partial fraction expansion of this system.  It was compared and shown to be identical to the hand calculated partial fraction expansion used to achieve equation 2.
+       
+       \begin{lstlisting}[language=Python]
+         [ 0.5 -0.5  1. ] [ 0. -4. -6.]
+       \end{lstlisting}
+       
+       Figure 2 then shows the output plot comparing the output of the Scipy Residue function combined with the cosine method as well as the output of the Scipy Step function for equation 3.  It can be seen that both of these plots are identical showing the comparability of hand calculations and the built in step response function.
+       
+       The following is the Scipy Residue output of the partial fraction expansion on performed on equation 3.  This was used in the cosine method for the figure 2 plot.
+       
+       \begin{lstlisting}[language=Python]
+         [ 1. -7.20391843e-17j -0.48557692+7.28365385e-01j
+         -0.48557692-7.28365385e-01j -0.21461963+0.00000000e+00j
+         0.09288674-4.76519337e-02j  0.09288674+4.76519337e-02j] 
+         [  0. +0.j  -3. +4.j  -3. -4.j -10. +0.j  -1.+10.j  -1.-10.j]
+       \end{lstlisting}
+       
+       
+       \begin{figure}[h!]
+           \centering
+           \includegraphics[scale=0.5]{prelab graph.png}
+           \caption{Step Response using Hand Calculations and Scipy Step}
+           \label{fig:my_label}
+       \end{figure}
+       
+       \begin{figure}[h!]
+           \centering
+           \includegraphics[scale=0.5]{big system.png}
+           \caption{Step Response using Scipy Residue/Cosine Method and Scipy Step}
+           \label{fig:my_label}
+       \end{figure}
+        \clearpage
+        
+        \section{Error Analysis}
+        There was no error produced in this lab since and ideal simulation was used.  The only difficulty that was encountered was reversing the residue and poles for the cosine method.  Once corrected, the plot outputted correctly.
+        
+        
+        \section{Questions}
+        \begin{enumerate}
+            \item For a non-complex pole-residue term, you can still use the cosine method, explain why this works.
+            
+            When there is a non-complex pole-residue term, there will be no complex numbers involved in the output.  In other words, the omega will be zero and the angle of the K term will be zero.  This will leave the cosine term with only a 0 inside, resulting in an output of 1.  With this being the case, the rest of the cosine method is exactly like performing a traditional step response on a non-complex system, making the cosine method still effective.
+            
+            \item Leave any feedback on the clarity of the expectations, instructions, and deliverables.
+            
+            This lab was very clear on what was expected.  The instructions written in lab were well defined and aided in the success of this lab.  The lab instructions also clearly defined the deliverables that were required to include in this report.  Overall, no improvements should be made to this lab.
+        \end{enumerate}
+        
+       \clearpage
+       \section{Conclusion}
+            This lab was helpful in understanding the job of the residue function in Python.  It showed how this function can be used to simplify the partial fraction expansion of complex transfer functions.  Additionally, this lab also gave further experience in using the Scipy Step function to find the step response of a given transfer function.  The comparison between this function, hand calculations, and coding of a cosine function showed identical results, proving that this function can be used as a replacement for hand calculations. All ideas in this lab were presented in a way that was successful in solidifying these concepts.
+      
+        \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
