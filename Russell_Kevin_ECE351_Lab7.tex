@@ -1,0 +1,238 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 7 %
+% October 13, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+
+\newcommand{\experimentDate}{October 13, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 7}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Block Diagrams and System Stability}
+\newcommand{\experimentShortName}{Block Diagrams and System Stability}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+\newpage
+    \tableofcontents
+    
+\newpage
+    \section{Introduction}    
+    The purpose of this lab was to become familiar with implementing block diagrams in Python.  In other words, using the factored form of the transfer function to manipulate an input.  This will use the Scipy tf2zpk function that is built into Python.  Additionally, this lab will also judge the system stability of the output of both a closed-loop and open-loop system.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics{blockdiagram.jpg}
+        \caption{Block Diagram used in Lab}
+        \label{fig:my_label}
+    \end{figure}
+    
+    \section{Equations}
+    The following were the original given transfer function equations from the lab sheet:
+    
+    \begin{equation}
+        G(s) = \frac{s+9}{(s^2-6s-16)(s+4)}
+    \end{equation}
+    \begin{equation}
+        A(s) = \frac{s+4}{s^2+4s+3}
+    \end{equation}
+    \begin{equation}
+        B(s) = s^2+26s+168
+    \end{equation}
+    
+    For part 1, task 1 of this lab, it was required to factor each of equations 1 through 3 and then find the poles and zeros of each.  The following are those equations in factored form.  The poles and zeros will be discussed in the results section.
+    
+    \begin{equation}
+        G(s) = \frac{s+9}{(s-8)(s+2)(s+4)}
+    \end{equation}
+    \begin{equation}
+        A(s) = \frac{s+4}{(s+3)(s+1)}
+    \end{equation}
+    \begin{equation}
+        B(s) = (s+12)(s+14)
+    \end{equation}
+    
+    Part 1, task 3 of this lab required hand calculating the output of the transfer function for the open-loop.  The following is the result from doing so.
+    
+    \begin{equation}
+        \nonumber
+        Y(s) = A(s)G(s)X(s)
+    \end{equation}
+    \begin{equation}
+        Y(s) = \frac{s+9}{(s+3)(s+1)(s-8)(s+2)}X(s)
+    \end{equation}
+    
+    Part 2 Task 1 required hand calculating the the output of the transfer function, symbolically, for the closed loop. Task 2 the required using python to determine the numerical values for the numerator and denominator. The following is the result from doing so.
+    
+    \begin{equation}
+        Y(s) = A(s)(\frac{G(s)}{1+G(s)B(s)})X(s)
+        \nonumber
+    \end{equation}
+    \begin{equation}
+        Y(s) = \frac{numAnumG}{denA(denG+numGnumB)}X(s)
+    \end{equation}
+    \begin{equation}
+        Y(s)=\frac{(s+9)(s+4)}{(s+5.16-9.52j)(s+5.16+9.52j)(S+6.18)(s+3)(s+1)}X(s)
+    \end{equation}
+    
+    
+    \section{Methodology}
+    To solve this lab, the three given transfer function  equations were first factored by hand and the zeros and poles of each were determined.  Then, the result was confirmed using Python's built in Scipy tf2zpk() function, which specializes in finding the zeros and poles of a function. The outputs for each equation was then printed.  Next, the transfer function for the open loop circuit was determined by hand.  Using python's convolve function, the equations 4 and 5 were combined and then the scipy Step function was used to determine the step response.  This was then plotted on a curve and confirmed with the TA.
+    
+    The second part of the lab was very similar, but involved the full closed loop.  The transfer function was first derived symbolically, shown in equation 8.  In python, the convolve function was used to combine the pieces of the numerator and denominator separately.  These were then used in the tf2zpk function which found the zeros and poles.  The zeros and poles were used to write the full factored transfer function.  Using the same output from the convolution, the step response was performed and then plotted.  This result was confirmed with the TA.
+    
+    \section{Results}
+    \subsection{Part 1}
+    The following is the printed outputs from python for each of the equations 4 through 6.
+        
+      \begin{lstlisting}[language=Python]  
+        Zeros for G(s): [-9.] 
+        Poles for G(s): [ 8. -4. -2.]
+        Zeros for A(s): [-4.] 
+        Poles for A(s): [-3. -1.]
+        Zeros for B(s): [-14. -12.] 
+        Poles for B(s): []
+        \end{lstlisting}
+        
+    These were compared to the following Results from the hand calculations:
+    \newline
+    G(s) Poles: 8,-2,-4 \newline
+    G(s) Zeros: -9 \newline
+    A(s) Poles: -3,-1 \newline
+    A(s) Zeros: -4 \newline
+    B(s) Poles: -12, -14 \newline
+    B(s) Zeros: None \newline
+    
+    As can be seen, the result from either hand calculations or python's built in function are identical.  This shows that either hand calculations or using the tf2zpk function are suitable replacements for each other, when necessary.
+    
+    From these expressions, it can be seen that the open-loop system, containing only of A(s) and G(s), is unstable.  This is because there is a single pole that is a positive value.  Automatically, this makes it so the response is unstable.
+    
+    Figure 1 shows the plot of the step response for this open-loop transfer function.  As can be seen, the plotted curve grows exponentially and never stops.  This clearly shows that the system is unstable.  Therefore, it supports the previous claim made that the system is unstable based on the results of finding the poles of the transfer function.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=.5]{pt1.png}
+        \caption{Open-Loop Step Response}
+        \label{fig:my_label}
+    \end{figure}
+    
+    \clearpage
+    
+    \subsection{Part 2}
+    The following is the output from Python for the closed loop numerator, denominator, zeros, and poles of equation 8 that was subsequently used to produce equation 9.  The result includes complex values, which would have been more difficult to do by hand.  Using python, this process was able to be sped up.
+    
+      \begin{lstlisting}[language=Python]  
+        Closed-Loop Numerator: [ 1 13 36] 
+        Closed-Loop Denominator: [   2   41  500 2995 6878 4344]
+        Closed-Loop Zeros: [-9. -4.] 
+        Closed-Loop poles: [-5.16+9.52j -5.16-9.52j -6.18+0.j   
+                            -3.  +0.j   -1.  +0.j  ]
+        \end{lstlisting}
+    
+    The poles from this result show that the closed loop transfer function is stable.  This is due to all the poles being on the left side of the complex-real plane.  In other words, all the poles have a negative value.
+    
+    Figure 2 uses the resulting numerator and denominator values to show the step response for this closed-loop transfer function.  As can be seen, the plot reaches a peak value and levels off, remaining at this value for an infinite time.  This supports the idea that this transfer function is stable.  Since it does not continue to grow exponentially, it has become stable.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=.5]{pt2.png}
+        \caption{Closed-Loop Step Response}
+        \label{fig:my_label}
+    \end{figure}
+    
+    
+        
+        \clearpage
+    \section{Error Analysis}
+    There was no error produced in this lab since and ideal simulation was used.  Additionally, this lab was straightforward and there were no difficulties that came up.
+    
+    \section{Questions}
+    \begin{enumerate}
+        \item Why does convolving the factored terms using scipy.signal.convolve() result in the expanded form of the numerator and denominator.  Would this work with your user-defined convolution function from Lab 3?
+        
+        Convolving the factored terms in the s-domain is essentially multiplying them together.  The convolution combines the two functions into one.  This works in Python since Python is unable to multiply matrices outside the time domain.
+        
+        The user-defined function in Lab 3 should serve the same purpose since we confirmed that it outputted the same ase the Scipy Convolution function.  The only difference is that a time vector may need to be defined when plotting.
+        
+        \item Discuss the difference between the open- and closed-loop systems from Part 1 and Part 2. How does stability differ for each case, and why?
+        
+        Open-loop systems take the shortest path from input to output while the closed loop functions also include any feedback.  In each of these cases there is a different stability.  The open-loop circuit is unstable because it has positive poles.  However, the closed-loop makes it become stable by having only negative poles.  The goal of any feedback loop is to make the transfer function stable by canceling out any unstable part from just the open loop.
+        
+        \item What is the difference between scipy.signal.residue() used in Lab 6 and scipy.signal.tf2zpk() used in this lab?
+        
+        The scipy.signal.residue() is meant to solve partial fractions.  It will decompose any multi-degree function into several equivalent fractional functions.  The scipy.signal.tf2zpk()does not have the ability to do this but rather just returns the zeros, poles, and gain of the function itself, without also expanding it.
+        
+        \item Is it possible for an open-loop system to be stable? What about for a closed-loop system to be unstable? Explain how or how not for each
+        
+        An open-loop system can be stable if it originally started as a stable system.  In other words, it may naturally be stable if the functions do to have positive poles.  On the other hand, the closed-loop could be unstable if ti doesn't cancel out all of the unstable components of the open loop.  Although it's purpose is to stabilize the transfer function, it may not do so entirely by not being designed properly.  Therefore, it may leave the transfer function unstable.
+        
+        \item Leave any feedback on the clarity/usefulness of the purpose, deliverables, and expectations for this lab.
+        
+        This lab was very clear on what was expected. The instructions written in lab were well defined and aided in the success of this lab. The lab instructions also clearly defined the deliverables that were required to include in this report. Overall, no improvements should be made to this lab.
+        
+    \end{enumerate}
+    
+    \section{Conclusion}
+    This lab was helpful in understanding the job of the tf2zpk() function in Python.  It showed the usefulness of this function and how it can save time compared to calculating parameters by hand for a transfer function.  Additionally, the lab gave further insight into the two different types of transfer functions, open and closed-loop, and their differences.  It was helpful to be able to see the stability of each type and be able to compare them. It is now known that negative feedback can allow a function to be stable, if designed properly.  All ideas in this lab were presented in a way that was successful in solidifying these concepts.
+
+    \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
