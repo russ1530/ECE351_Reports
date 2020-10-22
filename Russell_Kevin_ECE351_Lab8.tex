@@ -1,0 +1,174 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 8 %
+% October 20, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+
+\newcommand{\experimentDate}{October 20, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 8}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Fourier Series Approximation of a Square Wave}
+\newcommand{\experimentShortName}{Fourier Series}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+\newpage
+    \tableofcontents
+    
+\newpage
+    \section{Introduction}    
+    The purpose of this lab was to become familiar with using and implementing Fourier Series within the Python environment.  A square wave was given and the goal is to approximate it using Fourier Series and time-domain signals.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics{prelabSquareWave.png}
+        \caption{Given Square Wave}
+        \label{fig:my_label}
+    \end{figure}
+    
+    \section{Equations}
+    The following equations were found as part of the preliminary for this lab.  They make up the Fourier Series used to approximate the square wave in figure 1.  Since this function is odd, it is known that the a$_K$ terms will be zero.
+    
+     \begin{equation}
+           a_0=0
+           \nonumber
+       \end{equation}
+       \begin{equation}
+           a_K=0
+           \nonumber
+       \end{equation}
+       \begin{equation}
+           b_K=\frac{2-2\cos{(\pi K)}}{\pi K}
+           \nonumber
+       \end{equation}
+       \begin{equation}
+           x(t)=\sum_{K=1}^{\infty}\frac{2-2\cos{(\pi K)}}{\pi K}\sin{(\frac{2\pi Kt}{T})}
+       \end{equation}
+    
+    \section{Methodology}
+   To solve this lab, the a$_K$ and b$_K$ terms were first defined separately as a user defined function, using the equations from the prelab.  For a$_K$, the function will always return zero. For b$_K$, the prelab expression would be evaluated for any value of K that is inputted. Then, the specified values outlined in the lab handout were printed, including a$_1$, a$_2$, b$_1$, b$_2$, and b$_3$.
+   
+   Next, the Fourier Series was written using a user defined function and a for loop.  The user defined function takes in the time variable, period and number of iterations, K.  Omega was then found from the period.  A for loop was written to evaluate the Fourier series written in equation 1 for all values of K.  The result was then returned.  For this lab, K values of 1, 3, 15, 50, 150, and 1500 were plotted to show how the approximation changes with more iterations.
+    
+    \section{Results}
+    The following is the printed output from Task 1 for the values of A and B.
+    
+     \begin{lstlisting}[language=Python]  
+        a(0)= 0
+        a(1)= 0
+        b( 1 )= 1.2732395447351628
+        b( 2 )= 0.0
+        b( 3 )= 0.4244131815783876
+        \end{lstlisting}
+        
+    Next, the plots from the Fourier Series were plotted and the output is as follows.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=.45]{Plot 1.png}
+        \caption{Fourier Series Approximation, Plot 1}
+        \label{fig:my_label}
+    \end{figure}
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=.45]{Plot 2.png}
+        \caption{Fourier Series Approximation, Plot 2}
+        \label{fig:my_label}
+    \end{figure}
+    
+    These plots show that as the value of N increases, the approximation becomes closer and closer to the actual square wave.  This is due to more sine waves being used to make the approximation on every iteration.  The only exception is that there is a slight spike at the beginning and end of each square.  This is due to transients in the sine approximation and would occur in real life.  This can go away with a significant number more of iterations.
+    
+   \clearpage
+    \section{Error Analysis}
+    There was no error produced in this lab since and ideal simulation was used.  Additionally, this lab was straightforward and there were no difficulties that came up.
+    
+    \section{Questions}
+    \begin{enumerate}
+        \item Is X(t) an even or an odd function?  Explain why.
+        
+        X(t) is an odd function because it is not directly reflected over the y axis (even function), but is inversely reflected.  In other words, this odd function is symmetric to the origin. In mathematical terms, x(-t) = -x(t).  
+        
+        \item Based on your results from Task 1, what do you expect the values of a$_2$, a$_3$,... to be?  Why?
+        
+        I expect that all values for a$_n$ to be zero.  This is because the function is odd and the a$_n$ term becomes zero.  This is due to the negative pieces of the a$_n$ term cancelling out the positive pieces because of the reflection about the origin.
+        
+        \item How does the approximation of the square wave change as the value of N increases?  In what way does the Fourier series struggle to approximate the square wave?
+        
+        As the value of the N increase, the approximation of the square wave looks less like a combination of cosine/sine terms but rather the square wave itself.  The greater the N, the more accurate the approximation will be.  The Fourier series struggles in the approximation at the beginning and end of each square block with a spike in the value.  This is due to a transient spike from the combination of sinusoidal waves coming together.  This issue does become less and less of a problem with larger and larger values of N.
+        
+        \item What is occurring mathematically in the Fourier series summation as the value of N increases?
+        
+        As the value of N increase, the summation is combining more trigonometric terms.  Mathematically, this can be viewed as increasing the number of convolutions that is being performed.  The summation is merely combining each trigonometric term by  overlapping them and creating a larger term that is used to approximate the given signal.
+        
+        \item Leave any feedback on the clarity/usefulness of the purpose, deliverables, and expectations for this lab.
+        
+        This lab was very clear on what was expected. The instructions written in lab were well defined and aided in the success of this lab. The lab instructions also clearly defined the deliverables that were required to include in this report. Overall, no improvements should be made to this lab.
+        
+    \end{enumerate}
+       
+    \clearpage
+    \section{Conclusion}
+    This lab was helpful in further understanding the Fourier series and its purpose in approximating time-domain signals.  It showed how the number of iterations performed on the summation increases the accuracy of the approximation.  Additionally, this lab also gave an opportunity to understand what the Fourier series is doing fundamentally and the ways in which it can struggle. All ideas in this lab were presented in a way that was successful in solidifying these concepts.
+   
+    \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
