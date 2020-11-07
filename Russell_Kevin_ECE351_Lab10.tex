@@ -1,0 +1,196 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 10 %
+% NOvember 3, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+
+\newcommand{\experimentDate}{November 3, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 10}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Frequency Response}
+\newcommand{\experimentShortName}{Frequency Response}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+\newpage
+    \tableofcontents
+    
+\newpage
+    \section{Introduction}    
+    The purpose of this lab was to become familiar with frequency response tools and Bode plots in python.  This lab will explore how to create a Bode plot for a transfer function in different ways, with the circuit for the transfer function shown below.  Additionally, the Bode plot will be applied to a signal and python will plot the output.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics{Screenshot 2020-11-07 151035.png}
+        \label{fig:my_label}
+    \end{figure}
+    \clearpage
+    \section{Equations}
+    The following equations are used to describe the transfer function for the given circuit.
+    
+    \begin{equation}
+       H(s) = \frac{\frac{1}{RC}s}{s^2 +\frac{1}{RC}s+\frac{1}{LC}}    
+    \end{equation}
+    \begin{equation}
+          |H(j\omega)| = \frac{\frac{1}{RC}\omega}{\sqrt{(\frac{1}{LC}-\omega^2)^2+(\frac{1}{RC}\omega)^2}}
+    \end{equation}
+     \begin{equation}
+          \angle H(j\omega) = 90^\circ +\arctan{(\frac{\frac{1}{RC}\omega}{\frac{1}{LC}-\omega^2})}
+      \end{equation}
+      
+      The following is the signal that will be used in the second part of this lab.
+      
+      \begin{equation}
+          x(t) = \cos{(2\pi 100t)}+ \cos{(2\pi 3024t)} + \sin{(2\pi 50000t)}
+      \end{equation}
+    
+    \section{Methodology}
+    To solve this lab, the numerator and denominator of the transfer function were coded into python to use later.  Next, the amplitude and angle of the functions were also coded into python.  These were then plotted using the semilogx() pyplot function in order to achieve a logarithmic scale.  After plotting the angle, it was seen that it did not properly plot.  In order to adjust this, a for loop was instantiated that adjusted the phase by $\pi$ radians. 
+    
+    Next, the same two functions were plotted using scipy Bode function.  This function took in the numerator and denominator of the transfer function, as well as the range expected to plot.  The outputs, angle, magnitude and phase, were the plotted.  After plotting, also on a logarithmic scale, it was confirmed that this plot matched the previously plot.
+    
+    In order to convert to Hz, an example code that used functions from the control package was followed.  The two lines of code took in the numerator and denominator of the transfer function and then automatically outputted a plot of the function.
+    
+    For the next part of the lab, The signal from equation 4 was first plotted, ensuring that the frequency was high enough to capture all frequencies in the signal.  Then, the bilinear function was used to convert the transfer function to the z-domain.  This was then used in the lfilter function which took the signal and ran it through the z-domain transfer function.  The output was then plotted as a subplot to compare to the original signal.
+   
+    \section{Results}
+    The following figure shows the output of plotting the transfer function using the derived magnitude and phase functions.  From this plot, it can be seen that there is a clear corner frequency and that the phase shift follows.  This plot clearly removes both frequencies above and below the corner frequency.  
+    
+    \clearpage
+    \begin{figure}
+        \centering
+        \includegraphics[scale = 0.5]{Part 1 Task 1.png}
+        \caption{Magnitude and Phase of Transfer Function}
+        \label{fig:my_label}
+    \end{figure}
+    
+    Figure 3 then shows the bode plot created by using the numerator and denominator of the transfer function in the scipy bode function.  As can be seen, it is very close to being the same as the previous plot.  The with of the graph is much wider on the scipy function but still has the same corner frequency and phase plot.
+    \clearpage
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale = 0.5]{Part 1 Task 2.png}
+        \caption{Python Bode Plot}
+        \label{fig:my_label}
+    \end{figure}
+    
+    Figure 4 shows the same transfer function plotted in relation to frequency in Hz.  This plot still has the same shape as figure 3 evidencing the accuracy of this method.  The only difference is the y-axis scale is in Hz rather than rad/s.
+    \clearpage
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale = 1]{Part 1 Task 3.png}
+        \caption{Python Bode Plot, Hz}
+        \label{fig:my_label}
+    \end{figure}
+    
+    Figure 5 below shows both the signal form part 2 task 1, but also the result from running it through the transfer function.  As can be seen, prior to the transfer function, there is a significant amount of low and high frequency noise.  After running the signal through the transfer function, all of the noise is removed and the significant signal is clearly shown.
+    
+    \begin{figure}
+        \centering
+        \includegraphics[scale = 0.5]{Part 2.png}
+        \caption{Signal, Unfiltered and Filtered}
+        \label{fig:my_label}
+    \end{figure}
+    
+    
+    \clearpage
+    \section{Questions}
+    \begin{enumerate}
+        \item Explain how the filter and filtered output in Part 2 makes sense given the Bode plots from
+                Part 1. Discuss how the filter modifies specific frequency bands, in Hz.
+
+                The filter and filtered outputs make sense because before, there was a lot of high and low frequency noise.  The overall large sine wave is the low frequency noise, and the darkened parts of the wave is the high frequency noise.  The bode plot shows that the filter will attenuate both low and high frequencies because the curve drops on either side of the cutoff frequency.  The output then is an even curve with no high frequency noise. 
+                Specifically to the filter, it attenuates frequencies above and below approximately 20,000Hz at a rate of 20dB/decade.
+
+
+        \item Discuss the purpose and workings of scipy.signal.bilinear() and scipy.signal.lfilter().
+        
+        
+                The scipy.signal.bilinear() converts the transfer function from the s-domain to the Z-domain.  It uses Tustins method to substitute (z-1)/(z+1) for s.  This is used to run a function through a filter using the scipy.signal.lfilter() function.  This function specifically runs a signal through a z-domain filter.  The method uses an implementation of the standard difference equation.  Both of these function combined allow for a time domain signal to be run through an s-domain filter and output a time-domain function.
+        
+        \item What happens if you use a different sampling frequency in scipy.signal.bilinear() than
+                you used for the time-domain signal?
+                
+                If the frequency is different in the bilinear() function, the function is unable to completely filter out all of the frequencies if it is lower and may introduce more noise if it is higher.  This is evidenced in the figure below that shows the filtered output at a different frequency.  It can be seen that not all of the noise was filtered out.
+                
+                \begin{figure}[h!]
+                    \centering
+                    \includegraphics[scale = .5]{different frequency.png}
+                    \caption{Signal, Unfiltered and Filtered, Different Frequency}
+                    \label{fig:my_label}
+                \end{figure}
+        
+        \item Leave any feedback on the clarity/usefulness of the purpose, deliverables, and expectations for this lab.
+        
+        This lab was very clear on what was expected. The instructions written in lab were well defined and aided in the success of this lab. The lab instructions also clearly defined the deliverables that were required to include in this report. Overall, no improvements should be made to this lab.
+        
+    \end{enumerate}
+    
+       
+    \clearpage
+    \section{Conclusion}
+    
+    This lab provided a great demonstration of how to create bode plots using different methods in python.  Additionally, the lab showed how running a signal through a transfer function can remove noise and leave the significant function.  This will increase reliability in analysis and allow an engineer to more clearly understand the signal at hand.  All ideas in this lab were presented in a way that was successful in solidifying these concepts.
+    
+    
+    \section{GitHub Link}
+        https://github.com/russ1530
+
+\end{document}
