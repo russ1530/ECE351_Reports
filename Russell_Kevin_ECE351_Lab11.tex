@@ -1,0 +1,204 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 11 %
+% November 10, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+
+\newcommand{\experimentDate}{November 10, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 11}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Transform Operations}
+\newcommand{\experimentShortName}{Transform Operations}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+\newpage
+    \tableofcontents
+    
+\newpage
+    \section{Introduction}    
+    The purpose of this lab was to become familiar with analyzing a discrete system with Python's built-in functions.  This will incorporate a function developed by Christopher Felton that will allow for the stability of the system to be analyzed. Through this analysis, the frequency and phase response of the system will be shown.
+    
+    \section{Equations}
+    The following is the causal function used to describe the discrete system.
+    
+    \begin{equation}
+        y[k] = 2x[k]-40x[k-1]+10y[k-1]-16y[k-2]
+    \end{equation}
+    
+    \section{Methodology}
+    To solve this lab, the causal function was first solved for the transfer function in the Z-domain.  To do this, all of the y-terms were moved to one side of the equation.
+    
+    \begin{equation}
+        y[k] - 10y[k-1]+16y[k-2]= 2x[k]-40x[k-1]
+    \end{equation}
+    
+    Next, the z-transform of the function was taken, knowing that all initial conditions for a causal function would be zero.
+    
+    \begin{equation}
+        (1-10z^{-1}+16z^{-2})Y(z) = (2 - 40z^{-1})X(z)
+    \end{equation}
+    
+    The transfer function was then simply found by performing basic algebra operations.  The transfer function is shown below in equation 4.
+    
+    \begin{equation}
+        H(z) = \frac{2 - 40z^{-1}}{(1-8z^{-1})(1-2z^{-1})}
+    \end{equation}
+    
+    Using this transfer function, h[k] can be found by first algebraically manipulating it in order to take the inverse z-transform of the the transfer function.  This process is shown below.
+    
+    \begin{equation}
+        H(z) = \frac{2z(z-20)}{(z-8)(z-2)}
+    \end{equation}
+    
+    For the inverse transform, a Z must be "saved" in order to use after partial fraction decomposition is completed.
+    
+    \begin{equation}
+        \frac{H(z)}{z} = \frac{2(z-20)}{(z-8)(z-2)} = \frac{A}{z-8} + \frac{B}{z-2}
+    \end{equation}
+    
+    The values of A and B were found next following processes associated with partial fraction decomposition.
+    
+    \begin{equation}
+        A = \frac{2(z-20)}{z-2}\biggr\rvert_{z=8} = -4
+    \end{equation}
+    
+    \begin{equation}
+        B = \frac{2(z-20)}{z-8}\biggr\rvert_{z=2} = 6
+    \end{equation}
+    
+    These values were then back substituted and the "saved" z was multiplied back through the other side.
+    
+    \begin{equation}
+        H(z) = -4(\frac{z}{z-8})+6(\frac{z}{z-2})
+    \end{equation}
+    
+    It can be seen that this equation is now in the correct for to take the inverse z-transform.  A table of z-transforms was used to complete this task.  The result is shown below.
+    
+    \begin{equation}
+        h(k) = -4(8^k)u[k] + 6(2^k)u[k]
+    \end{equation}
+    
+    To check this work, the numerator and denominator of the transfer function were defined in python.  Then, the Scipy residuez() function was used to find the zeros and poles of the partial fraction expansion.  This result will be outlined in the appendix of this report.
+    
+    Next, the provided zplane() function from Christopher Felton was used to obtain the pole-zero plot for this transfer function.  The zplane() function took in the same numerator and denominator from the transfer function and automatically outputted the pole-zero plot.
+    
+    Finally, the Scipy freqz() function was used to find the magnitude and phase response of the transfer function.  This function also took in the numerator and denominator of the transfer function and outputted the frequency in rad/sample and the response as a complex number.  The absolute value of the response was taken to find the magnitude and the angle was taken to find the phase.  These values were then plotted against the frequency to show visually the response of the transfer function.
+    
+   
+    \section{Results}
+    
+    From the zplane() function, the following pole-zero plot was created.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics{Figure 2020-11-10 203535.png}
+        \caption{Pole-Zero Plot}
+        \label{fig:my_label}
+    \end{figure}
+    
+    As can be seen, all of the poles (orange x's) and the zeros (blue dots) are outside of the unit circle.  On this plot, the unit circle is the dotted oval shape on the left side.  With all zeros and poles outside the unit circle, the function is now known to be unstable.
+    
+    Next, the magnitude and phase response of the transfer function was plotted as follows.
+    
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale = .5]{Figure 2020-11-10 203535 (1).png}
+        \caption{Magnitude and Phase Response}
+        \label{fig:my_label}
+    \end{figure}
+    
+    This plot shows that there is an attenuation midway through the response at about 3 rad/sample.  This matches the phase plot with the phase shifting from positive to negative at this point.  Additionally, it would be expected that his is a stable function from the magnitude curve.  As shown by the pole-zero plot, this is in fact not a stable function.  This shows how in the z-domain, the magnitude and phase plot are unable to show stability of a function, in all cases.
+    
+    \clearpage
+    \section{Questions}
+    \begin{enumerate}
+        \item Looking at the plot generated in Task 4, is H(z) stable?  Explain.
+        
+        H(z) is not stable according to the pole-zero plot.  This is due to there being poles and zeros outside of the unit circle for this transfer function.  For a z-domain function, when this is the case, the function will not be stable.
+        
+        \item Leave any feedback on the clarity/usefulness of the purpose, deliverables, and expectations for this lab.
+        
+        This lab was very clear on what was expected. The instructions written in lab were well defined and aided in the success of this lab. The lab instructions also clearly defined the deliverables that were required to include in this report. Overall, no improvements should be made to this lab.
+    \end{enumerate}
+    
+    
+       
+    \clearpage
+    \section{Conclusion}
+    
+    This lab provided a great first look into finding the transfer function of a causal function as well as then finding the inverse z-transform.  Additionally, this lab also gave insight into how it is known if a z-domain function is stable or not using the provided zplane() function.  This was able to be compared to the magnitude and phase plot to show the response of the function as well as how stability can not always be read from the magnitude-phase plot.  All ideas in this lab were presented in a way that was successful in solidifying these concepts.
+    
+    
+    \section{GitHub Link}
+        https://github.com/russ1530
+        
+    \clearpage
+    \section{Appendix}
+    
+    Output from the Scipy residuez() of the transfer function is as follows.
+    
+    \begin{lstlisting}[language=Python]
+        Zeros: [ 6. -4.]
+        Poles: [2. 8.]
+    \end{lstlisting}
+
+\end{document}
