@@ -1,0 +1,253 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% Kevin Russell %
+% ECE 351-51 %
+% Lab 12 %
+% December 8, 2020 %
+% %
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, titlepage]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[strict]{changepage}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{mhchem}
+\usepackage{siunitx}
+\usepackage{wrapfig, booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{commath}
+\usepackage{amsmath}
+\usepackage[hang]{footmisc}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{listings}
+
+
+\newcommand{\experimentDate}{December 8, 2020}
+\newcommand{\className}{ECE 351}
+\newcommand{\sectionNumber}{51}
+\newcommand{\experimentNumber}{LAB 12}
+\author{Kevin Russell}
+\newcommand{\authorLastName}{Russell}
+\title{Filter Design}
+\newcommand{\experimentShortName}{Filter Design}
+
+\date{\parbox{\linewidth}{\centering%
+  \experimentDate
+  \endgraf\bigskip
+  \className\ -- Section \sectionNumber\
+}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\authorLastName\ \thepage}
+\lhead{\experimentShortName}
+\cfoot{\className\ -- \experimentNumber}
+
+\usepackage{color}
+\usepackage{sectsty}
+
+\definecolor{WordSectionBlue}{RGB}{30, 90, 147}
+
+\allsectionsfont{\color{WordSectionBlue}}
+
+\newcommand{\gpmol}{\si{\gram\per\mol}}
+\renewcommand{\baselinestretch}{2.0}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+
+
+
+
+\begin{document}
+
+ \newpage
+	    \maketitle
+\newpage
+    \tableofcontents
+    
+\newpage
+    \section{Introduction}    
+    The purpose of this lab was to apply skills learned throughout the semester in a practical application.  A filter will be designed to attenuate any unwanted noise from a position sensor.  This noise can cause inaccurate readings and reduce the performance of the system.  By applying a filter, only the applicable position measurement information is contained within an AC waveform.
+    
+    For the purposes of this lab, the sensor data that would come from an Oscilloscope was provided.
+    
+    \section{Equations}
+  
+  \textbf{Bandpass Filter Transfer Function}
+  
+  \begin{equation}
+      H(s) = \frac{\beta s}{s^2+\beta s+(\omega _0)^2}
+  \end{equation}
+  
+  \begin{equation}
+      H(s) = \frac{5024s}{s^2+5024s+(11938)^2}
+  \end{equation}
+  This equation was the result of trail and error modification after graphing the Bode plot in Python.  Originally, the equation came from using the known equation for a series RLC Bandpass filter, given in equation 1.  The known bandwidth and center frequency (in rad/s) were used in the function.  After looking at the Bode plot, the bandwidth had to be multiplied by 4 in order to meet the specifications of the design.
+  
+  These values were then used to find the analog components using the following equations:
+  
+  \begin{equation}
+      \beta = \frac{R}{L}
+  \end{equation}
+  \begin{equation}
+      \omega _0 ^2 = \frac{1}{LC}
+  \end{equation}
+    
+    \section{Methodology}
+    To solve this lab, the original signal was first plotted using the supplied starter code.  This code imported a .CSV file with the data and defined the time and sensor signal functions.  These were then plotted using the pyplot functions.
+    
+    Next, the supplied MakeStem code was defined in python.  This function speeds of the pyplot.stem() function that would take much longer to run for this set of data.  Additionally, the code that was created for the Fast Fourier Transform in Lab 9 was also added to this code file.  Using this FFT code, the magnitude, phase, and frequency of the signal were defined.  These values were then used in the MakeStem function to graph the frequency response of the signal.  After graphing the entire spectrum of frequencies, the range was reduced to look specifically at the low and high noise regions.  These regions are what is to be removed through this lab.
+    
+    After seeing the frequency response of the signal, a filter could be designed.  From prior class experience, it is known that an RLC bandpass filter is required to filter out the high and low noise, leaving only the sensor signals.  Since the range of desired frequencies were given in Hz, these were first converted to rad/s in order to create an accurate transfer function.  The center frequency was assumed to be the exact center of the range.  Using the corner frequencies, the bandwidth could be found by subtracting the higher frequency from the lower. Using equation 1 for the transfer function of a series RLC bandpass circuit, the bandwidth and corner frequencies were inserted to define the filter.  This function was then typed into python, splitting the numerator and denominator into separate arrays.  Using the control.TransferFunction(), and the control.Bode() function, the bode plot of this transfer function was plotted.  After seeing the bode plot, it was noticed that the bandwidth was not quite what was required.  By multiplying the bandwidth by 4, after trial and error of different values, an appropriate bode plot was achieved.  Next, using equations 3 and 4, the analog circuit component values were found. An appropriate resistor value was first chosen and the inductor and capacitor values were then solved for sequentially.  A circuit was then drawn, as per the requirements of this lab.
+    
+    Using the correct bode plot, the transfer function's accuarcy was further confirmed by focusing plots on the specific low and high noise frequency regions, in addition to the desired spectrum of frequencies to confirm a small amount of attenuation.  To do this, the frequency range inside of the control.bode() function was modified from the entire spectrum.  It was also discovered that these frequencies had to be converted to rad/s in order to have the correct plot.
+    
+    After confirming the accuracy and usefulness of the transfer function, it was applied to the original signal.  To do this, the transfer function was first converted to the z domain using the signal.bilinear() function.  The outputs, zeros and poles, were then inputted into the signal.lfilter() function, in addition to the sensor signal.  This function will apply the transfer function to the signal, outputting the filtered signal.  The filtered signal was then plotted.  Following the same steps as at the beginning of lab, the filter signal was then run through the FFT function and the stem graph was plotted for the entire frequency spectrum.  The range was then reduced to inspect the low and high frequencies to ensure the the transfer function was properly working.
+    
+   \clearpage
+    \section{Results}
+    
+    The following figure shows the original unfiltered input signal.  As can be seen, there is a significant amount of noise.  The low frequency noise is the overall longer wave through the entire plot.  The high frequency noise is the significant amount of darker blue region in the middle of the signal.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .75]{Figure 2020-12-01 204841.png}
+            \caption{Noisy Input Signal}
+            \label{fig:my_label}
+        \end{figure}
+        
+    \clearpage
+    Figure 2 shows the unfiltered signal as a stem plot of frequencies.  As can be seen, the main signal is between 1.8KHz and 2.0KHz.  The low frequency noise is situated around 60Hz, which is expected since that is the frequency that the United States power grid operates on.  The high frequency noise ranges from 20KHz to the end of the spectrum, but the switching amplifier noise can clearly be seen at 50KHz.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .75]{Figure 2020-12-01 204841 (1).png}
+            \caption{Unfiltered Spectrum of Noisy Input Signal}
+            \label{fig:my_label}
+        \end{figure}
+        
+    \clearpage
+    Figure 3 shows that zoomed in graph on the low and high bands of noise.  The specific frequencies in these plots more clearly show that they are the problem and need to be filtered out.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .7]{Figure 2020-12-01 204841 (2).png}
+            \caption{Unfiltered Spectrum of Noisy Input Signal: Low and High Bands}
+            \label{fig:my_label}
+        \end{figure}
+        
+    \clearpage   
+    Figure 4 shows clearly the region of frequencies that are desired and provide data from the sensor.  Although not important at this point in the lab, this plot will be helpful later to make sure that the filter does not attenuate the input sensor signal too much.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .7]{Figure 2020-12-01 204841 (3).png}
+            \caption{Unfiltered Spectrum of Noisy Input Signal: Desired Signal}
+            \label{fig:my_label}
+        \end{figure}
+        
+    \clearpage
+    Figure 5 shows the analog filter circuit that was derived from the the transfer function shown in equation 2.  The value for the resistor was chosen to be 1K$\Omega$.  Using equations 3 and 4, the values for the inductor and capacitor were found.  These values are as follows:
+    
+        R = 1K$\Omega$\newline
+        L = 200mH\newline
+        C = 352.6$\mu$F
+    
+    These values were found for a series RLC circuit, reflected in the circuit diagram in figure 5.  The output for the circuit was designed to be across the resistor, also shown in the figure.
+        
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .8]{circuit.jpg}
+            \caption{Analog Filter Circuit}
+            \label{fig:my_label}
+        \end{figure}
+    \clearpage
+    Figure 6 shows the bode plot for the magnitude and phase response of the transfer function and filter circuit.  As can be seen, the circuit meets the bandpass requirements of attenuating all frequencies excepting those from 1.8KHz to 2.0Khz.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .5]{Figure 2020-12-01 204841 (4).png}
+            \caption{Bode Plot of Filter Circuit}
+            \label{fig:my_label}
+        \end{figure}
+    \clearpage
+    Figure 7 highlights just this desired frequency range, from 1.8Khz to 2.0KHz.  The plot shows that this position measurement information region of frequencies will be attenuated less than -0.3dB.  This meets the design guidelines outlined in the lab handout.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .5]{Figure 2020-12-01 204841 (5).png}
+            \caption{Bode Plot of Filter Circuit: Desired Spectrum}
+            \label{fig:my_label}
+        \end{figure}
+    \clearpage
+    Figure 8 highlights just the switching amplifier noise region of the bode plot.  The plot shows that the switching noise frequency, centered around 50KHz, is attenuated by approximately -36dB.  This matches the design requirements that the switching amplifier noise must be attenuated by at least -21dB, as per the design specifications outlined in the lab handout.    
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .5]{Figure 2020-12-01 204841 (6).png}
+            \caption{Bode Plot of Filter Circuit: Switching Amplifier Noise Region}
+            \label{fig:my_label}
+        \end{figure}
+     \clearpage
+     Figure 9 highlights just the low-frequency vibration region of the bode plot.  The plot shows that the low-frequency vibration noise, centered around 60Hz, is attenuated by approximately -37.5dB.  This matches the design requirements that the low-frequency vibration noise must be attenuated by at least -30dB, as per the design specifications outlined in the lab handout.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .5]{Figure 2020-12-01 204841 (7).png}
+            \caption{Bode Plot of Filter Circuit: Low-Frequency Vibration Region}
+            \label{fig:my_label}
+        \end{figure}
+    \clearpage
+    After running the original sensor signal through the filter, the filtered output was able to be plotted.  This is shown in figure 10 below.  As can be seen, all of the darker, long wave length of low frequency noise has been removed, compared to original signal in figure 1.  Additionally, the significant amount of low amplitude high frequency noise has also been removed.  This leaves the desired output that will allow for further analysis of the sensor signal without results being modified by any noise.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .7]{Figure 2020-12-01 204841 (8).png}
+            \caption{Filtered Output Signal}
+            \label{fig:my_label}
+        \end{figure}
+    \clearpage
+    Finally, figures 11 through 13 show a comparison of the stem frequency response of the filtered vs unfiltered signals.  These plots cover the same region as figures 2 through 4.  As can be seen by all three plots, the filtered signal (shown as a green dashed line) only occurs in the desired frequency region of 1.8KHz to 2.0KHz.  all other regions have the signal attenuated enough where it will no longer interfere with the results from the sensor.  Figure 12 shows zoomed plots of the high and low noise regions, emphasizing again that the filter was successfully able to remove noise in these regions.  Figure 13 compares the sensor signal region showing that the filter did not significantly attenuate the sensor signal frequency range.
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .7]{Figure 2020-12-01 204841 (9).png}
+            \caption{Comparison of Spectrum of Noisy Signal}
+            \label{fig:my_label}
+        \end{figure}
+        
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .6]{Figure 2020-12-01 204841 (10).png}
+            \caption{Comparison of Spectrum of Noisy Signal in Low and High Bands}
+            \label{fig:my_label}
+        \end{figure}
+        
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[scale = .6]{Figure 2020-12-01 204841 (11).png}
+            \caption{Comparison of Spectrum of Desired Signal}
+            \label{fig:my_label}
+        \end{figure}
+        
+    
+   \clearpage
+    \section{Questions}
+    \begin{enumerate}
+        \item \textbf{Earlier this semester, you were asked what you personally wanted to get out of taking this course.  Do you feel that personal goal was met?  Why or why not?}
+        
+        Coming into this course, I had no experience with Python and minimal familiarity with Latex.  My personal goal was to become comfortable with each and to understand their usefulness.  This goal was met with this course.  Since every lab dealt with both Python and Latex, I became very familiar with each ecosystem and language very quickly.  I am more adept to use python to solve problems rather that complete hand calculations.  Additionally, the usefulness of python has become very clear, especially with the last few labs and this final, dealing with Fourier transforms and signal processing.  I can see how python is a very useful tool for completing these complex tasks in a very timely manner with incredible accuracy.  Latex provided a great way to make clean reports that a professional looking.  Although I still find it somewhat cumbersome to use, compared to Microsoft Word, I see how it is beneficial for equation writing and easy formatting.
+    \end{enumerate}
+   
+    
+    \section{Conclusion}
+    This lab provided a great opportunity to apply all skills learned throughout the semester to a practical application.  It allowed for a complete understanding of how python can effectively be used to process signals and see where frequencies of interest occur.  This lab gave an opportunity to practice practical skills by designing a filter to increase the accuracy of a sensor reading.  This will be helpful for future course and career applications that involve needing to process or interpret a given signal.  All ideas in this lab were presented in a way that further solidified concepts learned throughout the semester.
+    
+    
+    \section{GitHub Link}
+        https://github.com/russ1530
+        
+
+    \section{Appendix}
+    Attached to this report are the hand calculations for the transfer function and the subsequent analog filter circuit design.
+
+
+\end{document}
